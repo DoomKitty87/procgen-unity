@@ -1,0 +1,16 @@
+{
+  "name": "com.anselstanik.procgen",
+  "version": "1.0.0",
+  "displayName": "ProcGen",
+  "description": "Easy procedural generation using noise in Unity.",
+  "unity": "2021.3",
+  "unityRelease": "9f1",
+  "dependencies": {
+    "com.unity.burst": "0.2.0"
+  },
+  "author": {
+    "name": "Ansel Stanik",
+    "email": "ansel.stanik@icloud.com",
+    "url": "https://www.astanik.dev"
+  }
+}
