@@ -1,0 +1,11 @@
+{
+  "name": "procgen.Tests",
+  "references": {
+    "com.anselstanik.procgen"
+  },
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
