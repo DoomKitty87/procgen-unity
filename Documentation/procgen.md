@@ -1,0 +1,2 @@
+# ProcGen
+ProcGen is a simple-to-use procedural generation package, with modular support for most uses of landscape generation (and building generation coming). It uses Burst compiler to achieve great performance, and should run fine on most machines at scale.
