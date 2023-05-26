@@ -15,6 +15,15 @@ public class LandscapeGenerator : MonoBehaviour
 
   [SerializeField] private bool generateOnStart;
   [SerializeField] private bool generateOnUpdate;
+  [SerializeField] private int tilesX;
+  [SerializeField] private int tilesZ;
+  [SerializeField] private int tileResolution;
+  [SerializeField] private float tileScale;
+  [SerializeField] private int waves;
+  [SerializeField] private float amplitude;
+  [SerializeField] private float frequency;
+  [SerializeField] private int seed;
+  [SerializeField] private float yOffset;
 
   private void Start() {
     if (generateOnStart) GenerateLandscape();
@@ -38,6 +47,12 @@ public class LandscapeGenerator : MonoBehaviour
         noise = "cellular";
         break;
     }
-
+    for (int x = 0; x < tilesX; x++) {
+      for (int z = 0; z < tilesZ; z++) {
+        Vector3 position = new Vector3(x * tileResolution * tileScale, yOffset, z * tileResolution * tileScale);
+        GameObject tile = TileGeneration.GenerateTile(noise, position, seed, tileScale, tileResolution, tileResolution, tileScale, waves, amplitude, frequency);
+        tile.transform.parent = transform;
+      }
+    }
   }
 }
