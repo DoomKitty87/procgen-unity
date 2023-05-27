@@ -31,6 +31,9 @@ public class LandscapeGenerator : MonoBehaviour
   [SerializeField] private Transform lodTarget;
   [SerializeField] private float lodStartDistance;
 
+  [Header("Visual Settings")]
+  [SerializeField] private Material groundMaterial;
+
   private void Start() {
     if (generateOnStart) GenerateLandscape();
   }
@@ -66,6 +69,7 @@ public class LandscapeGenerator : MonoBehaviour
           tile = TileGeneration.GenerateTile(noise, position, seed, tileScale, tileResolution, tileResolution, noiseScale, waves, amplitude, frequency);
         }
         tile.transform.parent = transform;
+        tile.GetComponent<Renderer>().material = groundMaterial;
       }
     }
   }
