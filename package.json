@@ -1,6 +1,6 @@
 {
   "name": "com.anselstanik.procgen",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "ProcGen",
   "description": "Easy procedural generation using noise in Unity.",
   "unity": "2021.3",
