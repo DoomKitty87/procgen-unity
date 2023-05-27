@@ -24,5 +24,81 @@ namespace ProcGen
 
       return triangles;
     }
+
+    public static int[] windClosestFiltered(Vector3[] vertices, Vector3 origin) {
+      List<int> triangles = new List<int>();
+      for (int i = 0; i < vertices.Length; i++) {
+        float smallestDist = float.PositiveInfinity;
+        List<int> closestPoints = new List<int>();
+        for (int j = 0; j < vertices.Length; j++) {
+          if (j == i) continue;
+          float xdist = Mathf.Abs(vertices[i].x - vertices[j].x);
+          float ydist = Mathf.Abs(vertices[i].y - vertices[j].y);
+          float zdist = Mathf.Abs(vertices[i].z - vertices[j].z);
+          if (xdist + ydist + zdist < smallestDist) {
+            closestPoints.Clear();
+            closestPoints.Add(j);
+          }
+          else if (xdist + ydist + zdist == smallestDist) {
+            closestPoints.Add(j);
+          }
+        }
+        for (int j = 0; j < closestPoints.Length; j++) {
+          float smallestDistN = float.PositiveInfinity;
+          List<int> closestPointsN = new List<int>();
+          for (int k = 0; k < vertices.Length; k++) {
+            if (k == i || k == closestPoints[j]) continue;
+            float xdist = Mathf.Abs(vertices[i].x - vertices[k].x) + Mathf.Abs(vertices[closestPoints[j]].x - vertices[k].x);
+            float ydist = Mathf.Abs(vertices[i].y - vertices[k].y) + Mathf.Abs(vertices[closestPoints[j]].y - vertices[k].y);
+            float zdist = Mathf.Abs(vertices[i].z - vertices[k].z) + Mathf.Abs(vertices[closestPoints[j]].z - vertices[k].z);
+            if (xdist + ydist + zdist < smallestDist) {
+              closestPointsN.Clear();
+              closestPointsN.Add(k);
+            }
+            else if (xdist + ydist + zdist == smallestDist) {
+              closestPointsN.Add(k);
+            }
+          }
+          for (int k = 0; k < closestPointsN.Length; k++) {
+            triangles.Add(i);
+            triangles.Add(closestPoints[j]);
+            triangles.Add(closestPointsN[k]);
+          }
+        }
+      }
+      List<int> trianglesCleaned = new List<int>();
+      for (int i = 0; i < triangles.Length / 3; i++) {
+        bool unique = true;
+        for (int j = 0; j < trianglesCleaned.length / 3; j++) {
+          List<int> pool = new List<int>();
+          for (int k = 0; k < 3; k++) pool.Add(trianglesCleaned[j * 3 + k]);
+          for (int k = 0; k < 3; k++) {
+            for (int l = 0; l < 3; l++) {
+              if (triangles[i * 3 + k] == trianglesCleaned[j * 3 + l]) pool.Remove(trianglesCleaned[j * 3 + l]);
+            }
+          }
+          if (pool.Count == 0) {
+            unique = false;
+            break;
+          }
+        }
+        if (unique) {
+          /*
+          Vector3 triOrigin = new Vector3();
+          triOrigin.x = (vertices[triangles[i * 3]].x + vertices[triangles[i * 3 + 1]].x + vertices[triangles[i * 3 + 2]].x) / 3;
+          triOrigin.y = (vertices[triangles[i * 3]].y + vertices[triangles[i * 3 + 1]].y + vertices[triangles[i * 3 + 2]].y) / 3;
+          triOrigin.z = (vertices[triangles[i * 3]].z + vertices[triangles[i * 3 + 1]].z + vertices[triangles[i * 3 + 2]].z) / 3;
+          Vector3 originToTri = triOrigin - origin;
+
+          Vector3 perpendicular = new Vector3(Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).x, Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).y, triOrigin.z);
+          Vector3 relVectorCross = Vector3.Cross(originToTri, perpendicular).normalized;
+          */
+
+
+          for (int j = 0; j < 3; j++) trianglesCleaned.Add(triangles[i * 3 + j]);
+        }
+      }
+      return trianglesCleaned.ToArray();
+    }
   }
 }
