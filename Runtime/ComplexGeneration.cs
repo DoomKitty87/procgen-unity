@@ -30,13 +30,43 @@ namespace ProcGen
       GameObject sphere = new GameObject();
       sphere.AddComponent<MeshFilter>();
       sphere.AddComponent<MeshRenderer>();
-      UpdateSphereVertices(sphere, heightMap, radius);
+      UpdateSphereVerticesLatLong(sphere, heightMap, radius);
       sphere.transform.position = position;
 
       return sphere;
     }
 
-    public static GameObject UpdateSphereVertices(GameObject obj, float[,] heightMap, float radius) {
+    public static GameObject UpdateSphereVerticesLatLong(int numLatLines, int numLongLines, GameObject obj, float[,] heightMap, float radius) {
+      int vertCount = (numLatLines * (numLongLines + 1)) + 2;
+      Vector3[] vertices = new Vector3[vertCount];
+      vertices[0] = Vector3.up * radius * heightMap[0, 0];
+      vertices[vertCount - 1] = Vector3.down * radius * heightMap[0, numLatLines - 1];
+      float latSpacing = 1f / (numLatLines + 1f);
+      float longSpacing = 1f / numLongLines;
+
+      int v = 1;
+      for (int i = 0; i < numLatLines; i++) {
+        for (int j = 0; j < numLongLines; j++) {
+          float theta = (float)((j * longSpacing) * 2f * Mathf.PI);
+          float phi = (float)(((1f - ((i + 1) * latSpacing)) - 0.5f) * Mathf.PI);
+          float c = (float)Mathf.Cos(phi);
+          vertices[v] = new Vector3(c * Mathf.Cos(theta), Mathf.Sin(phi), c * Mathf.Sin(theta)) * heightMap[j, i] * radius;
+          v++;
+        }
+      }
+      
+      int[] triangles = TriangleWinding.WindSphere(numLatLines, numLongLines, vertices);
+      MeshFilter mf = obj.GetComponent<MeshFilter>();
+      mf.mesh.vertices = vertices;
+      mf.mesh.triangles = triangles;
+      mf.mesh.RecalculateBounds();
+      mf.mesh.RecalculateNormals();
+      if (obj.GetComponent<MeshCollider>() != null) obj.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
+
+      return obj;
+    }
+
+    public static GameObject UpdateSphereVerticesFibbonaci(GameObject obj, float[,] heightMap, float radius) {
       List<Vector3> vertices = new List<Vector3>();
       float phi = Mathf.PI * (Mathf.Sqrt(5f) - 1f);
       float samples = heightMap.GetLength(0) * heightMap.GetLength(1);

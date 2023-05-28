@@ -116,5 +116,38 @@ namespace ProcGen
       }
       return trianglesCleaned.ToArray();
     }
+
+    public static int[] WindSphere(int numLatLines, int numLongLines, Vector3[] vertices) {
+      int triangleCount = numLatLines * numLongLines * 2;
+      int[] verts = new int[triangleCount * 3];
+      int v = 0;
+      for (int i = 0; i < numLongLines; i++) {
+        verts[v++] = 0;
+        verts[v++] = i + 2;
+        verts[v++] = i + 1;
+      }
+      int rowLength = numLongLines + 1;
+      for (int i = 0; i < numLatLines - 1; i++) {
+        int rowStart = i * rowLength + 1;
+        for (int j = 0; j < numLongLines; j++) {
+          int firstCorner = rowStart + j;
+
+          verts[v++] = firstCorner;
+          verts[v++] = firstCorner + rowLength + 1;
+          verts[v++] = firstCorner + rowLength;
+          verts[v++] = firstCorner;
+          verts[v++] = firstCorner + 1;
+          verts[v++] = firstCorner + rowLength + 1;
+        }
+      }
+      int pole = vertices.Length - 1;
+      int bottomRow = (numLatLines - 1) * rowLength + 1;
+      for (int i = 0; i < numLongLines; i++) {
+        verts[v++] = pole;
+        verts[v++] = bottomRow + i;
+        verts[v++] = bottomRow + i + 1;
+      }
+      return verts;
+    }
   }
 }
