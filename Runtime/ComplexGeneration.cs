@@ -42,17 +42,17 @@ namespace ProcGen
       float samples = heightMap.GetLength(0) * heightMap.GetLength(1);
       for (int i = 0; i < samples; i++) {
         float y = 1f - (i / (samples - 1)) * 2f;
-        float radius = Mathf.Sqrt(1 - y * y);
+        float r = Mathf.Sqrt(1 - y * y);
         float theta = phi * i;
-        float x = Mathf.Cos(theta) * radius;
-        float z = Mathf.Sin(theta) * radius;
-        vertices.Add(new Vector3(x, y, z) * heightMap[i % heightMap.GetLength(0), (int)(i / heightMap.GetLength(0))]);
+        float x = Mathf.Cos(theta) * r;
+        float z = Mathf.Sin(theta) * r;
+        vertices.Add(new Vector3(x, y, z) * radius);
       }
 
-      int[] triangles = TriangleWinding.WindClosestFiltered(vertices, new Vector3());
+      int[] triangles = TriangleWinding.WindClosestFiltered(vertices.ToArray(), Vector3.zero);
 
       MeshFilter mf = obj.GetComponent<MeshFilter>();
-      mf.mesh.vertices = vertices;
+      mf.mesh.vertices = vertices.ToArray();
       mf.mesh.triangles = triangles;
       mf.mesh.RecalculateBounds();
       mf.mesh.RecalculateNormals();

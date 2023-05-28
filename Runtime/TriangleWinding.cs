@@ -9,7 +9,7 @@ namespace ProcGen
   {
 
     public static int[] WindSquarePlane(Vector3[] vertices) {
-      int[] triangles = new int[(vertices.Length * 6) - (int)Mathf.Sqrt(vertices.Length) * 2 + 1];
+      int[] triangles = new int[((vertices.Length - (int)Mathf.Sqrt(vertices.Length) * 2 + 1) * 6) ];
 
       for (int i = 0; i < vertices.Length; i++) {
         if (i >= vertices.Length - Mathf.Sqrt(vertices.Length) || i % Mathf.Sqrt(vertices.Length) == Mathf.Sqrt(vertices.Length) - 1) continue;
@@ -32,34 +32,30 @@ namespace ProcGen
         List<int> closestPoints = new List<int>();
         for (int j = 0; j < vertices.Length; j++) {
           if (j == i) continue;
-          float xdist = Mathf.Abs(vertices[i].x - vertices[j].x);
-          float ydist = Mathf.Abs(vertices[i].y - vertices[j].y);
-          float zdist = Mathf.Abs(vertices[i].z - vertices[j].z);
-          if (xdist + ydist + zdist < smallestDist) {
+          if (Vector3.Distance(vertices[i], vertices[j]) < smallestDist) {
+            smallestDist = Vector3.Distance(vertices[i], vertices[j]);
             closestPoints.Clear();
             closestPoints.Add(j);
           }
-          else if (xdist + ydist + zdist == smallestDist) {
+          else if (Vector3.Distance(vertices[i], vertices[j]) == smallestDist) {
             closestPoints.Add(j);
           }
         }
-        for (int j = 0; j < closestPoints.Length; j++) {
+        for (int j = 0; j < closestPoints.Count; j++) {
           float smallestDistN = float.PositiveInfinity;
           List<int> closestPointsN = new List<int>();
           for (int k = 0; k < vertices.Length; k++) {
             if (k == i || k == closestPoints[j]) continue;
-            float xdist = Mathf.Abs(vertices[i].x - vertices[k].x) + Mathf.Abs(vertices[closestPoints[j]].x - vertices[k].x);
-            float ydist = Mathf.Abs(vertices[i].y - vertices[k].y) + Mathf.Abs(vertices[closestPoints[j]].y - vertices[k].y);
-            float zdist = Mathf.Abs(vertices[i].z - vertices[k].z) + Mathf.Abs(vertices[closestPoints[j]].z - vertices[k].z);
-            if (xdist + ydist + zdist < smallestDist) {
+            if (Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]) < smallestDistN) {
+              smallestDistN = Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]);
               closestPointsN.Clear();
               closestPointsN.Add(k);
             }
-            else if (xdist + ydist + zdist == smallestDist) {
+            else if (Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]) == smallestDistN) {
               closestPointsN.Add(k);
             }
           }
-          for (int k = 0; k < closestPointsN.Length; k++) {
+          for (int k = 0; k < closestPointsN.Count; k++) {
             triangles.Add(i);
             triangles.Add(closestPoints[j]);
             triangles.Add(closestPointsN[k]);
@@ -67,9 +63,9 @@ namespace ProcGen
         }
       }
       List<int> trianglesCleaned = new List<int>();
-      for (int i = 0; i < triangles.Length / 3; i++) {
+      for (int i = 0; i < triangles.Count / 3; i++) {
         bool unique = true;
-        for (int j = 0; j < trianglesCleaned.length / 3; j++) {
+        for (int j = 0; j < trianglesCleaned.Count / 3; j++) {
           List<int> pool = new List<int>();
           for (int k = 0; k < 3; k++) pool.Add(trianglesCleaned[j * 3 + k]);
           for (int k = 0; k < 3; k++) {
@@ -83,7 +79,6 @@ namespace ProcGen
           }
         }
         if (unique) {
-          
           Vector3 triOrigin = new Vector3();
           triOrigin.x = (vertices[triangles[i * 3]].x + vertices[triangles[i * 3 + 1]].x + vertices[triangles[i * 3 + 2]].x) / 3;
           triOrigin.y = (vertices[triangles[i * 3]].y + vertices[triangles[i * 3 + 1]].y + vertices[triangles[i * 3 + 2]].y) / 3;
@@ -93,7 +88,7 @@ namespace ProcGen
           Vector3 perpendicular = new Vector3(Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).x, Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).y, triOrigin.z).normalized;
           Vector3 relVectorCross = Vector3.Cross(originToTri.normalized, perpendicular).normalized;
           float greatestDotX = 0;
-          float greatestDotIndexX = 0;
+          int greatestDotIndexX = 0;
           for (int j = 0; j < 3; j++) {
             float dot = Vector3.Dot(vertices[triangles[i * 3 + j]] - triOrigin, relVectorCross);
             if (dot > greatestDotX) {
@@ -102,7 +97,7 @@ namespace ProcGen
             }
           }
           float greatestDotY = 0;
-          float greatestDotIndexY = 0;
+          int greatestDotIndexY = 0;
           for (int j = 0; j < 3; j++) {
             if (j == greatestDotIndexX) continue;
             float dot = Vector3.Dot(vertices[triangles[i * 3 + j]] - triOrigin, perpendicular);
@@ -115,7 +110,6 @@ namespace ProcGen
           trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexX]);
           trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexY]);
           trianglesCleaned.Add(triangles[i * 3 + 3 - greatestDotIndexX - greatestDotIndexY]);
-
           //for (int j = 0; j < 3; j++) trianglesCleaned.Add(triangles[i * 3 + j]);
         }
       }
