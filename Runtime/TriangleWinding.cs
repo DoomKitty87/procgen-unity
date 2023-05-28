@@ -46,12 +46,13 @@ namespace ProcGen
           List<int> closestPointsN = new List<int>();
           for (int k = 0; k < vertices.Length; k++) {
             if (k == i || k == closestPoints[j]) continue;
-            if (Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]) < smallestDistN) {
-              smallestDistN = Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]);
+            Vector3 avg = new Vector3((vertices[i].x + vertices[closestPoints[j]].x) / 2, (vertices[i].y + vertices[closestPoints[j]].y) / 2, (vertices[i].z + vertices[closestPoints[j]].z) / 2);
+            if (Vector3.Distance(vertices[k], avg) < smallestDistN) {
+              smallestDistN = Vector3.Distance(vertices[k], avg);
               closestPointsN.Clear();
               closestPointsN.Add(k);
             }
-            else if (Vector3.Distance(vertices[i], vertices[k]) + Vector3.Distance(vertices[i], vertices[closestPoints[j]]) == smallestDistN) {
+            else if (Vector3.Distance(vertices[k], avg) == smallestDistN) {
               closestPointsN.Add(k);
             }
           }
@@ -107,9 +108,9 @@ namespace ProcGen
             }
           }
 
-          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexX]);
-          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexY]);
           trianglesCleaned.Add(triangles[i * 3 + 3 - greatestDotIndexX - greatestDotIndexY]);
+          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexY]);
+          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexX]);
           //for (int j = 0; j < 3; j++) trianglesCleaned.Add(triangles[i * 3 + j]);
         }
       }

@@ -46,7 +46,7 @@ namespace ProcGen
         float theta = phi * i;
         float x = Mathf.Cos(theta) * r;
         float z = Mathf.Sin(theta) * r;
-        vertices.Add(new Vector3(x, y, z) * radius);
+        vertices.Add(new Vector3(x, y, z) * heightMap[i % heightMap.GetLength(0), i / heightMap.GetLength(0)] * radius);
       }
 
       int[] triangles = TriangleWinding.WindClosestFiltered(vertices.ToArray(), Vector3.zero);
