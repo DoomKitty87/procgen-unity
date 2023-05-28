@@ -83,19 +83,40 @@ namespace ProcGen
           }
         }
         if (unique) {
-          /*
+          
           Vector3 triOrigin = new Vector3();
           triOrigin.x = (vertices[triangles[i * 3]].x + vertices[triangles[i * 3 + 1]].x + vertices[triangles[i * 3 + 2]].x) / 3;
           triOrigin.y = (vertices[triangles[i * 3]].y + vertices[triangles[i * 3 + 1]].y + vertices[triangles[i * 3 + 2]].y) / 3;
           triOrigin.z = (vertices[triangles[i * 3]].z + vertices[triangles[i * 3 + 1]].z + vertices[triangles[i * 3 + 2]].z) / 3;
           Vector3 originToTri = triOrigin - origin;
 
-          Vector3 perpendicular = new Vector3(Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).x, Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).y, triOrigin.z);
-          Vector3 relVectorCross = Vector3.Cross(originToTri, perpendicular).normalized;
-          */
+          Vector3 perpendicular = new Vector3(Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).x, Vector2.Perpendicular(new Vector2(originToTri.x, originToTri.y)).y, triOrigin.z).normalized;
+          Vector3 relVectorCross = Vector3.Cross(originToTri.normalized, perpendicular).normalized;
+          float greatestDotX = 0;
+          float greatestDotIndexX = 0;
+          for (int j = 0; j < 3; j++) {
+            float dot = Vector3.Dot(vertices[triangles[i * 3 + j]] - triOrigin, relVectorCross);
+            if (dot > greatestDotX) {
+              greatestDotX = dot;
+              greatestDotIndexX = j;
+            }
+          }
+          float greatestDotY = 0;
+          float greatestDotIndexY = 0;
+          for (int j = 0; j < 3; j++) {
+            if (j == greatestDotIndexX) continue;
+            float dot = Vector3.Dot(vertices[triangles[i * 3 + j]] - triOrigin, perpendicular);
+            if (dot > greatestDotY) {
+              greatestDotY = dot;
+              greatestDotIndexY = j;
+            }
+          }
 
+          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexX]);
+          trianglesCleaned.Add(triangles[i * 3 + greatestDotIndexY]);
+          trianglesCleaned.Add(triangles[i * 3 + 3 - greatestDotIndexX - greatestDotIndexY]);
 
-          for (int j = 0; j < 3; j++) trianglesCleaned.Add(triangles[i * 3 + j]);
+          //for (int j = 0; j < 3; j++) trianglesCleaned.Add(triangles[i * 3 + j]);
         }
       }
       return trianglesCleaned.ToArray();
