@@ -8,7 +8,7 @@ namespace ProcGen
   public static class TriangleWinding
   {
 
-    public static int[] windSquarePlane(Vector3[] vertices) {
+    public static int[] WindSquarePlane(Vector3[] vertices) {
       int[] triangles = new int[(vertices.Length * 6) - (int)Mathf.Sqrt(vertices.Length) * 2 + 1];
 
       for (int i = 0; i < vertices.Length; i++) {
@@ -25,7 +25,7 @@ namespace ProcGen
       return triangles;
     }
 
-    public static int[] windClosestFiltered(Vector3[] vertices, Vector3 origin) {
+    public static int[] WindClosestFiltered(Vector3[] vertices, Vector3 origin) {
       List<int> triangles = new List<int>();
       for (int i = 0; i < vertices.Length; i++) {
         float smallestDist = float.PositiveInfinity;
